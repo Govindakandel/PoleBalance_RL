@@ -56,41 +56,82 @@ class  DQN(torch.nn.Module):
          return  self.layerStack(x)
 
 episode_durations = []
-# activate interactive mode
-plt.ion()
-plt.figure(1)
-plt.xlabel('Eposide')
-plt.ylabel('Reward')
+
+# Detect notebook backend
+IS_NOTEBOOK = 'inline' in matplotlib.get_backend().lower()
+
+if IS_NOTEBOOK:
+    from IPython.display import display, clear_output
+else:
+    plt.ion()
+
+
+# Initialize plot only once
+fig, ax = plt.subplots()
+
+ax.set_xlabel('Episode')
+ax.set_ylabel('Reward')
+ax.set_title('Training')
+ax.grid(True)
+
+# Create lines only once
+reward_line, = ax.plot([], [], color='blue', label='Reward')
+
+average_line, = ax.plot(
+    [], [],
+    color='red',
+    label='100 Episode Average'
+)
+
+ax.legend()
+
 
 def plot_durations(show_result=False):
-    plt.figure(1)
+
+    episodes = np.arange(1 , len(episode_durations)+1)
     durations_t = torch.tensor(episode_durations, dtype=torch.float)
-    if show_result:
-        plt.title("Result")
-    else :
-        plt.title("Training")
-    #  update the plots
-    plt.plot( durations_t.numpy(), color='blue')
-    # Take 100 episode averages and plot them too
-    if len( durations_t) >= 100:
+    
+    # Update reward line
+    reward_line.set_data(
+        episodes,
+        durations_t.numpy()
+    )
+
+    # Update 100 episode moving average
+    if len(episode_durations) >= 100:
+
         means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
         means = torch.cat((torch.zeros(99), means))
-        plt.plot(means.numpy() , color='red')
+        average_line.set_data(
+            episodes,
+            means.numpy()
+        )
 
-    plt.pause(0.001)
-    if 'inline' in matplotlib.get_backend() :
-        display(plt.gcf())
+    # Update axes
+    ax.relim()
+    ax.autoscale_view()
+
+    ax.set_title('Result' if show_result else 'Training')
+
+    # Notebook rendering
+    if IS_NOTEBOOK:
+
         clear_output(wait=True)
-    else :
-        plt.figure(plt.gcf())
-        plt.show(block=False)
+        display(fig)
+
+    # Python script rendering
+    else:
+
+        fig.canvas.draw_idle()
+        fig.canvas.flush_events()
+        plt.pause(0.001)
         
 
 BATCH_SIZE = 128
 GAMMA = 0.99
 EPS_START = 0.9
 EPS_END = 0.01
-EPS_DECAY = 2500
+EPS_DECAY = 2000
 TAU = 0.005
 LR = 3e-4
 
@@ -167,7 +208,7 @@ def optimize_model() :
 
  # main tranning loop
 def main() :
-        for eposide in range(50):
+        for eposide in range(250):
             # reset the env
             state , info = env.reset()
             state = torch.tensor(state , dtype=torch.float32 , device=device).unsqueeze(0)
@@ -207,6 +248,7 @@ def main() :
                     episode_durations.append(total_reward)
                     if (eposide+1)% 10 == 0 :
                        plot_durations()
+
                     eposide_end = True
 
 
