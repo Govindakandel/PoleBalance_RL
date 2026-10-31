@@ -9,11 +9,14 @@ Balancing an inverted pendulum (the classic **CartPole-v1** problem) using **Dee
 The agent is trained for **200 episodes**. It starts off failing within a few steps and gradually learns to balance the pole — eventually hitting rewards close to the environment cap of **500**.
 
 ![DQN Training Result](resultDQN.png)
-![Agent Playing Video](AgentPlay.gif)
 
 - 🔵 **Blue line** — total reward per episode
 - 🔴 **Red line** — 100-episode moving average (the true performance trend, reaching ~200)
 
+---
+## Agent GamePlay ##
+
+![Agent Playing Video](AgentPlay.gif)
 ## 🧠 How It Works
 
 The project follows the DQN recipe from *"Human-level control through deep reinforcement learning"* (Mnih et al., 2015):
