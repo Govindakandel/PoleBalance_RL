@@ -167,7 +167,7 @@ def optimize_model() :
 
  # main tranning loop
 def main() :
-        for eposide in range(200) :
+        for eposide in range(50):
             # reset the env
             state , info = env.reset()
             state = torch.tensor(state , dtype=torch.float32 , device=device).unsqueeze(0)
@@ -216,7 +216,7 @@ def main() :
         plot_durations(show_result=True)
         # save the result
         plt.figure(1).savefig("resultDQN.png")
-        print("Save model to path :" , os.path.join(os.getcwd() , "resultDQN.png"))
+        print("Save resultImage to path :" , os.path.join(os.getcwd() , "resultDQN.png"))
         # save the model
         torch.save(policy_net.state_dict() , "dpn_cartpole.pth")
         print("Save model to path :" , os.path.join(os.getcwd() , "dpn_cartpole.pth"))
